@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vcluster-k3s
+spec:
+  destination:
+    name: ''
+    namespace: vcluster-k3s
+    server: 'https://kubernetes.default.svc'
+  source:
+    path: helm/k3s
+    repoURL: 'https://github.com/PasquinNicolas/working-with-vcluster.git'
+    targetRevision: HEAD
+    helm:
+      parameters:
+        - name: 'vcluster.syncer.extraArgs[0]'
+          value: '--tls-san=vcluster-k3s.example.com'
+        - name: ingress.clusterIssuer
+          value: letsencrypt-dns
+        - name: ingress.host
+          value: vcluster-k3s.example.com
+  sources: []
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
